@@ -4,6 +4,8 @@
 
 # TESIS_ESPOL · Base analítica ENDI R2
 
+La lectura independiente del archivo Stata de Personas y su diccionario de códigos se documenta en [Personas DTA](02_DOCUMENTACION/01_DOCUMENTACION_MODULOS/12_PERSONAS_DTA.md). El [script 08](03_PROCESOS_ETL/08_PERSONAS_DTA.py) valida la fuente sin conectar por defecto; `--cargar` crea dos tablas nuevas en `research_lab.endi` cuando se dispone de autenticación. Las [consultas de revisión](02_DOCUMENTACION/02_MAPEO_ENDI/08_CONSULTAS_PERSONAS_DTA.sql) permiten consultar las etiquetas después de cargar.
+
 ## Autor
 
 **Marcelo Chávez · CEO de ConneXData**
@@ -335,3 +337,14 @@ El repositorio mantiene separados los datos originales, los procesos, la configu
 El autor abre [07_REPORTE_PROVINCIAL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/07_REPORTE_PROVINCIAL.sql) en DBeaver, conectado a `research_lab`, y ejecuta el archivo como script. Los diez resultados permiten revisar restricciones, datos y diccionario; el último presenta DCI en menores de 2 y 5 años por provincia y total continental, con `fexp` de Personas y etiquetas del diccionario. Los controles deben indicar OK antes de interpretar los porcentajes.
 
 Se trata de estimaciones puntuales descriptivas: no incluyen IC ni CV y las sumas de ponderadores normalizados no son totales poblacionales. La [guía del reporte](02_DOCUMENTACION/07_MODULOS/11_REPORTE_PROVINCIAL.md) documenta fuentes, denominadores, relaciones y validaciones.
+
+## Catálogo territorial INEC 2026
+
+`research_lab.catalogos.dpa_inec` contiene 1.562 códigos ordinarios verticalizados en `pk_dpa`, `tipo_dpa` y `descripcion_dpa`: 24 provincias, 222 cantones y 1.316 códigos parroquiales, incluidas cabeceras y parroquias urbanas/rurales. Se conservan ceros iniciales y nombres oficiales de las hojas detalladas del Excel INEC 2026. Las zonas en estudio se excluyen expresamente de estos tres niveles.
+
+- [Cargador Python](03_PROCESOS_ETL/09_CATALOGO_DPA_INEC.py).
+- [SQL completo con estructura y datos públicos del catálogo](02_DOCUMENTACION/02_MAPEO_ENDI/08_DPA_INEC.sql).
+- [Mapeo de las tres columnas](02_DOCUMENTACION/02_MAPEO_ENDI/09_MAPEO_DPA_INEC.csv).
+- [Documentación, fuente, controles y reproducción](02_DOCUMENTACION/01_DOCUMENTACION_MODULOS/12_CATALOGO_DPA_INEC.md).
+
+La edición tiene corte al 31 de diciembre de 2025 y no sustituye automáticamente el clasificador histórico de ENDI. El módulo usa las ubicaciones actuales de las carpetas reorganizadas por el autor.

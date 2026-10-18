@@ -95,5 +95,30 @@
       "02_RESUMEN_MAPEO.json": "c02e10e54f441f182dd8853593794c9ef170ba8205e9aa13d8f57584015b45ea",
       "03_TIPOS_POSTGRESQL.sql": "2a39093b3206752fd5696a9273bbc55caee83cf86807ac0081e09a1bbcce633a"
     }
+  },
+  "catalogo_dpa": {
+    "edicion": 2026,
+    "corte": "2025-12-31",
+    "esquema": "catalogos",
+    "tabla": "dpa_inec",
+    "archivo": "09_CODIFICACION_2026.xlsx",
+    "url": "https://aplicaciones2.ecuadorencifras.gob.ec/SIN/descargas/cdpa2026.xlsx",
+    "sha256": "0d0ae33a0a0023ed44abcaa6b38a1c173fbda423e368a8f12bedda59d65d8f3a",
+    "conteos": {
+      "PROVINCIA": 24,
+      "CANTON": 222,
+      "PARROQUIA": 1316
+    },
+    "codigos_excluidos": [
+      "90",
+      "9006",
+      "9009",
+      "900651",
+      "900951",
+      "140190"
+    ],
+    "sql": "02_DOCUMENTACION/02_MAPEO_ENDI/08_DPA_INEC.sql",
+    "mapeo": "02_DOCUMENTACION/02_MAPEO_ENDI/09_MAPEO_DPA_INEC.csv",
+    "validacion": "02_DOCUMENTACION/03_VALIDACIONES/30_CATALOGO_DPA_INEC.json"
   }
 }

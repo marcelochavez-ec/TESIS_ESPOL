@@ -3,6 +3,7 @@
 # Pruebas y evidencias de ejecución locales.
 /03_PROCESOS_ETL/05_PRUEBAS/
 /02_DOCUMENTACION/09_VALIDACIONES/
+/02_DOCUMENTACION/03_VALIDACIONES/
 # Residuos técnicos; no se excluyen documentos por su extensión.
 __pycache__/
 *.py[cod]
