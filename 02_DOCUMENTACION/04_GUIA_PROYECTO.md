@@ -26,3 +26,7 @@ docker compose -f 05_CONFIGURACIONES/compose.yaml run --build --rm recarga
 17. **Contenido local excluido de GitHub.** 01_DATOS_FUENTE, 03_PROCESOS_ETL/05_PRUEBAS, 02_DOCUMENTACION/09_VALIDACIONES y residuos técnicos quedan fuera del respaldo. Se incluyen scripts, agentes, configuración, catálogo, SQL y documentos PDF/Word/libros. La suite local es opcional para reproducir una copia publicada; su ausencia se informa sin simular pruebas correctas. Git ya está inicializado localmente y core.excludesFile apunta al archivo de la carpeta 05; el respaldo conserva el historial remoto de main.
 
 18. **Modelo físico.** Hay 6 PK, 12 FK, 7 UNIQUE y 11 CHECK, además de NOT NULL e índices auxiliares. Se mantienen las 1.423 variables fuente y se añade una columna derivada en Salud: id_per_miembro, para enlazar miembros con Personas y conservar los 171 no miembros terminados en 77. El SQL reproducible está en 08_MAPEO_ENDI/04_RESTRICCIONES_POSTGRESQL.sql.
+
+19. **Portada pública.** [README.md](../README.md) presenta a Marcelo Chávez, CEO de ConneXData, con su [perfil LinkedIn](https://www.linkedin.com/in/marcelochavezec/), contexto de la tesis y catálogo de carpetas y archivos. El mantenimiento se documenta en 07_MODULOS/08_PORTADA_Y_CATALOGO.md.
+
+20. **Identidad visual.** 06_IMG/ConneXData.jpeg contiene la imagen proporcionada por el autor y se publica para utilizarla en la portada. No se utiliza el logo de ESPOL. La estructura tiene seis carpetas numeradas; README es la única excepción de presentación en la raíz.

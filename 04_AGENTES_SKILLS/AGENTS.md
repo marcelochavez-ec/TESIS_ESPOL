@@ -6,7 +6,7 @@
 2. Este es el único agente del proyecto. Se abre `04_AGENTES_SKILLS` en Codex para cargarlo. Las rutas siguientes se interpretan desde su directorio padre, `TESIS_ESPOL`; concede acceso a esa raíz si el cliente lo requiere.
 3. Lee `02_DOCUMENTACION/04_GUIA_PROYECTO.md`, `05_CONFIGURACIONES/01_PROYECTO.json` y el documento del módulo en `02_DOCUMENTACION/07_MODULOS/` antes de cambiar código.
 4. La etapa actual comprende el mapeo y la recarga explícita de las seis tablas fuente en research_lab.endi, confirmada por el usuario. La recarga incluye el modelo relacional autorizado: 6 PK, 12 FK, 7 UNIQUE, 11 CHECK y NOT NULL. Lee 02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md antes de modificarlo. El comando reproducir conserva su alcance sin escritura SQL; ejecutar --sobrescribir-fuentes realiza la recarga autorizada.
-5. Mantén las cinco carpetas principales, numeración y nombres en español y mayúsculas. Conserva los nombres técnicos requeridos de AGENTS.md, SKILL.md, environment.yml, requirements.txt, Dockerfile y compose.yaml dentro de sus carpetas. No crees archivos sueltos ni carpetas .agents o .codex en la raíz.
+5. Mantén las carpetas numeradas de datos, documentación, procesos, agentes, configuraciones e imágenes. README.md es la excepción explícita en la raíz para la portada de GitHub; incluye biografía confirmada, contexto, catálogo y enlaces. Conserva los nombres técnicos requeridos de AGENTS.md, SKILL.md, environment.yml, requirements.txt, Dockerfile y compose.yaml dentro de sus carpetas. No crees otros archivos sueltos ni carpetas .agents o .codex en la raíz.
 
 ## 2. Código, datos y reproducción
 
@@ -46,3 +46,8 @@ Lee solo la skill pertinente:
 1. Salud usa id_hijo_ord como PK. Conservar sus id_per terminados en 77: son no miembros y pueden repetirse. La FK a Personas usa la columna calculada STORED id_per_miembro, nula exclusivamente para esos casos; no reemplazar el identificador original.
 2. id_cuid referencia Personas, no obligatoriamente MEF. La FK MEF.id_mef apunta a Personas.id_mef; no invertirla, porque Personas contiene mujeres que no figuran en el formulario de madres.
 3. No convertir cruces analíticos entre poblaciones parcialmente coincidentes en FK obligatorias; documentar las excepciones. No eliminar filas ni usar CASCADE para hacer pasar restricciones. Aplicar el modelo después del mapeo y COPY, dentro de la misma transacción.
+
+## 6. Presentación pública
+
+1. El autor es Marcelo Chávez, CEO de ConneXData. Su perfil público es https://www.linkedin.com/in/marcelochavezec/. Usar únicamente datos biográficos confirmados y la marca ConneXData; no añadir grados académicos o experiencias no verificadas.
+2. La portada usa 06_IMG/ConneXData.jpeg. No incorporar el logo de ESPOL por indicación del autor. Mantener README.md, los enlaces relativos y el catálogo por archivo al cambiar la estructura. La documentación de esta presentación está en 02_DOCUMENTACION/07_MODULOS/08_PORTADA_Y_CATALOGO.md.
