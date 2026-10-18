@@ -50,6 +50,7 @@ La preparación de datos implementada no equivale a resultados estadísticos de 
 | Revisar claves, relaciones y diagrama | [Modelo entidad-relación](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md) |
 | Ver el diagrama compacto en DBeaver | [Configuración de DBeaver](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) |
 | Consultar etiquetas y claves de cada variable | [Diccionario en PostgreSQL](02_DOCUMENTACION/07_MODULOS/10_DICCIONARIO_VARIABLES.md) |
+| Obtener tabulados provinciales y auditar relaciones | [Reporte provincial SQL](02_DOCUMENTACION/07_MODULOS/11_REPORTE_PROVINCIAL.md) |
 | Trabajar con el agente del proyecto | [AGENTS.md](04_AGENTES_SKILLS/AGENTS.md) |
 
 ```text
@@ -115,6 +116,7 @@ TESIS_ESPOL/
 | [08_PORTADA_Y_CATALOGO.md](02_DOCUMENTACION/07_MODULOS/08_PORTADA_Y_CATALOGO.md) | Mantenimiento del README, biografía, identidad visual y navegación. |
 | [09_DBEAVER_COMPACTO.md](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) | Preferencia visual para mostrar claves y relaciones sin desplegar todas las columnas. |
 | [10_DICCIONARIO_VARIABLES.md](02_DOCUMENTACION/07_MODULOS/10_DICCIONARIO_VARIABLES.md) | Tabla única de etiquetas, vínculos PK/FK/CHECK/UNIQUE/NOT NULL, comentarios y consultas SQL. |
+| [11_REPORTE_PROVINCIAL.md](02_DOCUMENTACION/07_MODULOS/11_REPORTE_PROVINCIAL.md) | Fundamento metodológico, ejecución e interpretación del tabulado provincial y las auditorías. |
 
 #### `08_MAPEO_ENDI` · Catálogo y SQL reproducible
 
@@ -126,6 +128,7 @@ TESIS_ESPOL/
 | [04_RESTRICCIONES_POSTGRESQL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/04_RESTRICCIONES_POSTGRESQL.sql) | SQL transaccional del modelo relacional: claves, restricciones e índices. |
 | [05_DICCIONARIO_POSTGRESQL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/05_DICCIONARIO_POSTGRESQL.sql) | Estructura del diccionario, tabla de vínculos, validaciones y vista de consulta. |
 | [06_MAPEO_DICCIONARIO.csv](02_DOCUMENTACION/08_MAPEO_ENDI/06_MAPEO_DICCIONARIO.csv) | Tipos y longitudes de los campos de las dos tablas de metadatos. |
+| [07_REPORTE_PROVINCIAL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/07_REPORTE_PROVINCIAL.sql) | Diez resultados de solo lectura: integridad, diccionario y DCI ponderada por provincia y total continental. |
 
 <details>
 <summary><strong>09_VALIDACIONES · Archivo por archivo de las evidencias locales</strong></summary>
@@ -159,6 +162,9 @@ Esta carpeta está excluida de GitHub. Los archivos siguientes describen verific
 | `24_ETL_CON_DICCIONARIO.txt` | Registro del ETL completo con modelo y diccionario. |
 | `25_REPETICION_DICCIONARIO.json` | Comparación de fuentes, modelo y diccionario entre Windows y Docker. |
 | `26_CONTENEDOR_DICCIONARIO.txt` | Construcción y ejecución de la distribución con diccionario. |
+| `27_VALIDACION_REPORTE_PROVINCIAL.json` | Auditorías SQL, repetición e indicadores contrastados independientemente. |
+| `28_LECTURA_METODOLOGICA/` | Extracción de ambos PDF y páginas 16/22 de la guía renderizadas para revisión local. |
+| `29_TABULADO_PROVINCIAL.csv` | Resultado local: 23 provincias y total continental, con dos indicadores de DCI. |
 
 </details>
 
@@ -323,3 +329,9 @@ No se versionan contraseñas. Las exclusiones se guardan en [05_CONFIGURACIONES/
 Cada cambio funcional se documenta en `02_DOCUMENTACION/07_MODULOS`. Cuando se agregan, retiran o renombran archivos, se actualizan las referencias de esta portada y el inventario global. Los nombres y hashes del inventario representan el estado de la copia local donde se generó, incluidos archivos que deliberadamente no se distribuyen.
 
 El repositorio mantiene separados los datos originales, los procesos, la configuración y la documentación, de modo que el trabajo de tesis pueda revisarse, continuarse y reproducirse a partir de sus entradas verificadas.
+
+## Tabulado provincial de comprobación
+
+El autor abre [07_REPORTE_PROVINCIAL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/07_REPORTE_PROVINCIAL.sql) en DBeaver, conectado a `research_lab`, y ejecuta el archivo como script. Los diez resultados permiten revisar restricciones, datos y diccionario; el último presenta DCI en menores de 2 y 5 años por provincia y total continental, con `fexp` de Personas y etiquetas del diccionario. Los controles deben indicar OK antes de interpretar los porcentajes.
+
+Se trata de estimaciones puntuales descriptivas: no incluyen IC ni CV y las sumas de ponderadores normalizados no son totales poblacionales. La [guía del reporte](02_DOCUMENTACION/07_MODULOS/11_REPORTE_PROVINCIAL.md) documenta fuentes, denominadores, relaciones y validaciones.
