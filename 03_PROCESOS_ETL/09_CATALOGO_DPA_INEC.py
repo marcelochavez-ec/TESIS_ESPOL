@@ -19,6 +19,11 @@ ORDEN = {'PROVINCIA':1,'CANTON':2,'PARROQUIA':3}
 EXPRESION_ORDEN = "CASE tipo_dpa WHEN 'PROVINCIA' THEN 1 WHEN 'CANTON' THEN 2 WHEN 'PARROQUIA' THEN 3 END"
 MIGRACION_ORDEN = ('ALTER TABLE catalogos.dpa_inec ADD COLUMN IF NOT EXISTS orden_dpa SMALLINT '
                    f'GENERATED ALWAYS AS ({EXPRESION_ORDEN}) STORED NOT NULL')
+ORDEN_FISICO = (
+    'CREATE INDEX IF NOT EXISTS ix_dpa_inec_orden ON catalogos.dpa_inec (orden_dpa,pk_dpa)',
+    'CLUSTER catalogos.dpa_inec USING ix_dpa_inec_orden',
+    'ANALYZE catalogos.dpa_inec',
+)
 
 
 def configuracion(raiz):
@@ -70,6 +75,7 @@ def preparar(raiz=RAIZ, descargar=False):
             raise ValueError(f'Cantón padre inexistente: {cod}')
     df = pd.DataFrame(sorted(registros.values()), columns=['pk_dpa','tipo_dpa','descripcion_dpa'])
     df['orden_dpa'] = df.tipo_dpa.map(ORDEN)
+    df = df.sort_values(['orden_dpa','pk_dpa']).reset_index(drop=True)
     conteos = {k:int(v) for k,v in df.tipo_dpa.value_counts().items()}
     if conteos != cat['conteos']:
         raise ValueError(f'Conteos distintos de la entrega aprobada: {conteos}')
@@ -99,6 +105,7 @@ def generar_artefactos(raiz, preparados):
     literal = lambda valor: "'"+valor.replace("'","''")+"'"
     valores = ',\n'.join('('+','.join(literal(v) for v in fila)+')'
                          for fila in df[['pk_dpa','tipo_dpa','descripcion_dpa']].itertuples(index=False,name=None))
+    orden_fisico = ';\n'.join(ORDEN_FISICO)
     sql = f"""-- CATÁLOGO DPA INEC {cat['edicion']}; corte {cat['corte']}.
 -- Fuente: {cat['url']}
 -- SHA-256 Excel: {cat['sha256']}
@@ -153,6 +160,7 @@ DO $check$ BEGIN
  IF EXISTS (SELECT 1 FROM catalogos.dpa_inec WHERE orden_dpa IS DISTINCT FROM ({EXPRESION_ORDEN}))
  THEN RAISE EXCEPTION 'Orden distinto del nivel territorial'; END IF;
 END $check$;
+{orden_fisico};
 SELECT orden_dpa,tipo_dpa,count(*) AS registros FROM catalogos.dpa_inec GROUP BY orden_dpa,tipo_dpa ORDER BY orden_dpa;
 COMMIT;
 """
@@ -190,10 +198,15 @@ def cargar(raiz, preparados, conexion):
         where=tabla.c.tipo_dpa.is_distinct_from(sentencia.excluded.tipo_dpa) |
               tabla.c.descripcion_dpa.is_distinct_from(sentencia.excluded.descripcion_dpa))
     conexion.execute(sentencia,df.drop(columns='orden_dpa').to_dict(orient='records'))
-    esperadas = list(df.itertuples(index=False,name=None))
+    esperadas = list(df.sort_values('pk_dpa').itertuples(index=False,name=None))
     reales = [tuple(f) for f in conexion.exec_driver_sql('SELECT pk_dpa,tipo_dpa,descripcion_dpa,orden_dpa FROM catalogos.dpa_inec ORDER BY pk_dpa')]
     if reales != esperadas:
         raise ValueError('Contenido distinto del catálogo aprobado; la transacción se revierte sin borrar filas ajenas.')
+    for sentencia in ORDEN_FISICO:
+        conexion.exec_driver_sql(sentencia)
+    posiciones = [tuple(f) for f in conexion.exec_driver_sql('SELECT orden_dpa,pk_dpa FROM catalogos.dpa_inec ORDER BY ctid')]
+    if posiciones != sorted(posiciones):
+        raise ValueError('El almacenamiento no quedó ordenado por nivel y código.')
     # Reutilizar los comentarios del SQL exportado conserva exactamente su documentación.
     for linea in (Path(raiz)/config['catalogo_dpa']['sql']).read_text(encoding='utf-8').splitlines():
         if linea.startswith('COMMENT ON '):
@@ -201,6 +214,7 @@ def cargar(raiz, preparados, conexion):
     return {'base':'research_lab','tabla':'catalogos.dpa_inec','edicion':2026,
             'conteos':config['catalogo_dpa']['conteos'],'total':len(df),'contenido_verificado':True,
             'orden_dpa':ORDEN,
+            'poblacion_ordenada_fisicamente':True,
             'sha256_contenido':hashlib.sha256(json.dumps(reales,ensure_ascii=False).encode()).hexdigest()}
 
 

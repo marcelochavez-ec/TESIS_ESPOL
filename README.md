@@ -350,3 +350,5 @@ Se trata de estimaciones puntuales descriptivas: no incluyen IC ni CV y las suma
 La edición tiene corte al 31 de diciembre de 2025 y no sustituye automáticamente el clasificador histórico de ENDI. El módulo usa las ubicaciones actuales de las carpetas reorganizadas por el autor.
 
 Para mostrar primero provincias, luego cantones y finalmente parroquias se consulta `catalogos.dpa_inec` con `ORDER BY orden_dpa, pk_dpa`. El orden se calcula automáticamente a partir del tipo territorial.
+
+El cargador DPA también agrupa la población almacenada por nivel y código: inserta en esa secuencia y reorganiza la tabla existente con el índice `ix_dpa_inec_orden`. La cuadrícula del cliente debe actualizarse y conservar el orden ascendente `orden_dpa, pk_dpa` para una visualización estable.
