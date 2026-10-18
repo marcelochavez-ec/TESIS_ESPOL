@@ -1,4 +1,5 @@
 ﻿variable,tipo_origen,tipo_valores,tipo_sql,criterio,nulos,longitud_observada,longitud_declarada
-pk_dpa,str,string,VARCHAR(6),declarado,0,6,6.0
-tipo_dpa,str,string,VARCHAR(19),inferido,0,9,19.0
-descripcion_dpa,str,string,TEXT,declarado,0,42,
+pk_dpa,str,string,VARCHAR(6),declarado,0,6.0,6.0
+tipo_dpa,str,string,VARCHAR(19),inferido,0,9.0,19.0
+descripcion_dpa,str,string,TEXT,declarado,0,42.0,
+orden_dpa,int64,integer,SMALLINT,declarado,0,,

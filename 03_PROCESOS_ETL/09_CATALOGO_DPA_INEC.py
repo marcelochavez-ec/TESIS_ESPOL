@@ -8,13 +8,17 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 import pandas as pd
-from sqlalchemy import CheckConstraint, Column, MetaData, PrimaryKeyConstraint, Table, inspect
+from sqlalchemy import CheckConstraint, Column, Computed, MetaData, PrimaryKeyConstraint, Table, inspect
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.schema import CreateTable
 
 mapeo = import_module('02_MAPEO_POSTGRESQL')
 RAIZ = Path(__file__).resolve().parents[1]
+ORDEN = {'PROVINCIA':1,'CANTON':2,'PARROQUIA':3}
+EXPRESION_ORDEN = "CASE tipo_dpa WHEN 'PROVINCIA' THEN 1 WHEN 'CANTON' THEN 2 WHEN 'PARROQUIA' THEN 3 END"
+MIGRACION_ORDEN = ('ALTER TABLE catalogos.dpa_inec ADD COLUMN IF NOT EXISTS orden_dpa SMALLINT '
+                   f'GENERATED ALWAYS AS ({EXPRESION_ORDEN}) STORED NOT NULL')
 
 
 def configuracion(raiz):
@@ -22,7 +26,7 @@ def configuracion(raiz):
 
 
 def preparar(raiz=RAIZ, descargar=False):
-    """Valida el Excel fijado, verticaliza sus niveles y mapea las tres columnas."""
+    """Valida el Excel fijado, verticaliza sus niveles y mapea datos y orden calculado."""
     config = configuracion(raiz)
     cat = config['catalogo_dpa']
     archivo = Path(raiz)/config['rutas']['fuentes']/cat['archivo']
@@ -65,17 +69,19 @@ def preparar(raiz=RAIZ, descargar=False):
         if tipo == 'PARROQUIA' and registros.get(cod[:4], (None,None))[1] != 'CANTON':
             raise ValueError(f'Cantón padre inexistente: {cod}')
     df = pd.DataFrame(sorted(registros.values()), columns=['pk_dpa','tipo_dpa','descripcion_dpa'])
+    df['orden_dpa'] = df.tipo_dpa.map(ORDEN)
     conteos = {k:int(v) for k,v in df.tipo_dpa.value_counts().items()}
     if conteos != cat['conteos']:
         raise ValueError(f'Conteos distintos de la entrega aprobada: {conteos}')
-    return mapeo.mapear_dataframe(df, {'pk_dpa':'VARCHAR(6)','descripcion_dpa':'TEXT'}, margen=10)
+    return mapeo.mapear_dataframe(df, {'pk_dpa':'VARCHAR(6)','descripcion_dpa':'TEXT','orden_dpa':'SMALLINT'}, margen=10)
 
 
 def tabla_catalogo(tipos, esquema='catalogos'):
     if esquema != 'catalogos':
         raise ValueError('El catálogo autorizado pertenece a catalogos.')
     return Table('dpa_inec', MetaData(),
-        *(Column(c,t,nullable=False) for c,t in tipos.items()),
+        *(Column(c,t,Computed(EXPRESION_ORDEN,persisted=True),nullable=False) if c=='orden_dpa'
+          else Column(c,t,nullable=False) for c,t in tipos.items()),
         PrimaryKeyConstraint('pk_dpa',name='pk_dpa_inec'),
         CheckConstraint("(tipo_dpa='PROVINCIA' AND pk_dpa ~ '^[0-9]{2}$') OR "
                         "(tipo_dpa='CANTON' AND pk_dpa ~ '^[0-9]{4}$') OR "
@@ -92,7 +98,7 @@ def generar_artefactos(raiz, preparados):
     ddl = str(CreateTable(tabla,if_not_exists=True).compile(dialect=postgresql.dialect())).strip()
     literal = lambda valor: "'"+valor.replace("'","''")+"'"
     valores = ',\n'.join('('+','.join(literal(v) for v in fila)+')'
-                         for fila in df.itertuples(index=False,name=None))
+                         for fila in df[['pk_dpa','tipo_dpa','descripcion_dpa']].itertuples(index=False,name=None))
     sql = f"""-- CATÁLOGO DPA INEC {cat['edicion']}; corte {cat['corte']}.
 -- Fuente: {cat['url']}
 -- SHA-256 Excel: {cat['sha256']}
@@ -107,6 +113,7 @@ END $guard$;
 CREATE SCHEMA IF NOT EXISTS catalogos;
 {ddl};
 LOCK TABLE catalogos.dpa_inec IN SHARE ROW EXCLUSIVE MODE;
+{MIGRACION_ORDEN};
 DO $estructura$ BEGIN
  IF (SELECT count(*) FROM pg_catalog.pg_constraint WHERE conrelid='catalogos.dpa_inec'::regclass
   AND conname IN ('pk_dpa_inec','ck_dpa_inec_tipo_codigo','ck_dpa_inec_descripcion')
@@ -114,11 +121,13 @@ DO $estructura$ BEGIN
   RAISE EXCEPTION 'Faltan restricciones validadas del catálogo';
  END IF;
  IF (SELECT count(*) FROM pg_catalog.pg_attribute WHERE attrelid='catalogos.dpa_inec'::regclass
-  AND attnum>0 AND NOT attisdropped)<>3 OR
+  AND attnum>0 AND NOT attisdropped)<>4 OR
  (SELECT count(*) FROM pg_catalog.pg_attribute a JOIN (VALUES
-  ('pk_dpa','character varying(6)'),('tipo_dpa','character varying(19)'),('descripcion_dpa','text')) e(nombre,tipo)
+  ('pk_dpa','character varying(6)'),('tipo_dpa','character varying(19)'),('descripcion_dpa','text'),('orden_dpa','smallint')) e(nombre,tipo)
   ON a.attname=e.nombre AND pg_catalog.format_type(a.atttypid,a.atttypmod)=e.tipo
-  WHERE a.attrelid='catalogos.dpa_inec'::regclass AND a.attnotnull AND NOT a.attisdropped)<>3 THEN
+  WHERE a.attrelid='catalogos.dpa_inec'::regclass AND a.attnotnull AND NOT a.attisdropped)<>4 OR
+ NOT EXISTS (SELECT 1 FROM pg_catalog.pg_attribute WHERE attrelid='catalogos.dpa_inec'::regclass
+  AND attname='orden_dpa' AND attgenerated='s' AND NOT attisdropped) THEN
   RAISE EXCEPTION 'Estructura existente distinta del mapeo; requiere migración explícita';
  END IF;
 END $estructura$;
@@ -132,6 +141,7 @@ COMMENT ON TABLE catalogos.dpa_inec IS 'INEC CGE 2026, corte 2025-12-31; código
 COMMENT ON COLUMN catalogos.dpa_inec.pk_dpa IS 'Código oficial DPA como texto: provincia 2, cantón 4, parroquia/cabecera 6 dígitos. Conserva ceros iniciales.';
 COMMENT ON COLUMN catalogos.dpa_inec.tipo_dpa IS 'Nivel del código: PROVINCIA, CANTON o PARROQUIA. El nivel parroquial incluye cabeceras cantonales, rurales y urbanas.';
 COMMENT ON COLUMN catalogos.dpa_inec.descripcion_dpa IS 'Denominación oficial de las hojas detalladas PROVINCIAS, CANTONES y PARROQUIAS del Excel INEC 2026.';
+COMMENT ON COLUMN catalogos.dpa_inec.orden_dpa IS 'Orden calculado: 1 PROVINCIA, 2 CANTON, 3 PARROQUIA. Consultar con ORDER BY orden_dpa,pk_dpa.';
 DO $check$ BEGIN
  IF (SELECT count(*) FROM catalogos.dpa_inec)<>{len(df)} THEN
   RAISE EXCEPTION 'Conteo distinto de la entrega; no se borran filas ajenas';
@@ -140,8 +150,10 @@ DO $check$ BEGIN
   (h.tipo_dpa<>'PROVINCIA' AND NOT EXISTS (SELECT 1 FROM catalogos.dpa_inec p WHERE p.pk_dpa=left(h.pk_dpa,2) AND p.tipo_dpa='PROVINCIA')) OR
   (h.tipo_dpa='PARROQUIA' AND NOT EXISTS (SELECT 1 FROM catalogos.dpa_inec p WHERE p.pk_dpa=left(h.pk_dpa,4) AND p.tipo_dpa='CANTON')))
  THEN RAISE EXCEPTION 'Falta provincia o cantón padre'; END IF;
+ IF EXISTS (SELECT 1 FROM catalogos.dpa_inec WHERE orden_dpa IS DISTINCT FROM ({EXPRESION_ORDEN}))
+ THEN RAISE EXCEPTION 'Orden distinto del nivel territorial'; END IF;
 END $check$;
-SELECT tipo_dpa,count(*) AS registros FROM catalogos.dpa_inec GROUP BY tipo_dpa ORDER BY tipo_dpa;
+SELECT orden_dpa,tipo_dpa,count(*) AS registros FROM catalogos.dpa_inec GROUP BY orden_dpa,tipo_dpa ORDER BY orden_dpa;
 COMMIT;
 """
     destino = Path(raiz)/cat['sql']
@@ -162,8 +174,11 @@ def cargar(raiz, preparados, conexion):
     conexion.exec_driver_sql('CREATE SCHEMA IF NOT EXISTS catalogos')
     tabla.metadata.create_all(conexion)
     conexion.exec_driver_sql('LOCK TABLE catalogos.dpa_inec IN SHARE ROW EXCLUSIVE MODE')
+    conexion.exec_driver_sql(MIGRACION_ORDEN)
     reales = inspect(conexion).get_columns('dpa_inec',schema='catalogos')
-    if {c['name']:str(c['type']) for c in reales} != {c:str(t) for c,t in tipos.items()} or any(c['nullable'] for c in reales):
+    if ({c['name']:str(c['type']) for c in reales} != {c:str(t) for c,t in tipos.items()}
+            or any(c['nullable'] for c in reales)
+            or not next(c for c in reales if c['name']=='orden_dpa').get('computed',{}).get('persisted')):
         raise ValueError('Estructura existente distinta del mapeo; se requiere migración explícita.')
     pk = inspect(conexion).get_pk_constraint('dpa_inec',schema='catalogos')
     checks = inspect(conexion).get_check_constraints('dpa_inec',schema='catalogos')
@@ -174,9 +189,9 @@ def cargar(raiz, preparados, conexion):
         set_={'tipo_dpa':sentencia.excluded.tipo_dpa,'descripcion_dpa':sentencia.excluded.descripcion_dpa},
         where=tabla.c.tipo_dpa.is_distinct_from(sentencia.excluded.tipo_dpa) |
               tabla.c.descripcion_dpa.is_distinct_from(sentencia.excluded.descripcion_dpa))
-    conexion.execute(sentencia,df.to_dict(orient='records'))
+    conexion.execute(sentencia,df.drop(columns='orden_dpa').to_dict(orient='records'))
     esperadas = list(df.itertuples(index=False,name=None))
-    reales = [tuple(f) for f in conexion.exec_driver_sql('SELECT pk_dpa,tipo_dpa,descripcion_dpa FROM catalogos.dpa_inec ORDER BY pk_dpa')]
+    reales = [tuple(f) for f in conexion.exec_driver_sql('SELECT pk_dpa,tipo_dpa,descripcion_dpa,orden_dpa FROM catalogos.dpa_inec ORDER BY pk_dpa')]
     if reales != esperadas:
         raise ValueError('Contenido distinto del catálogo aprobado; la transacción se revierte sin borrar filas ajenas.')
     # Reutilizar los comentarios del SQL exportado conserva exactamente su documentación.
@@ -185,6 +200,7 @@ def cargar(raiz, preparados, conexion):
             conexion.exec_driver_sql(linea)
     return {'base':'research_lab','tabla':'catalogos.dpa_inec','edicion':2026,
             'conteos':config['catalogo_dpa']['conteos'],'total':len(df),'contenido_verificado':True,
+            'orden_dpa':ORDEN,
             'sha256_contenido':hashlib.sha256(json.dumps(reales,ensure_ascii=False).encode()).hexdigest()}
 
 

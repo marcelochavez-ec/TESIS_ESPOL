@@ -14,11 +14,13 @@ CREATE TABLE IF NOT EXISTS catalogos.dpa_inec (
 	pk_dpa VARCHAR(6) NOT NULL,
 	tipo_dpa VARCHAR(19) NOT NULL,
 	descripcion_dpa TEXT NOT NULL,
+	orden_dpa SMALLINT GENERATED ALWAYS AS (CASE tipo_dpa WHEN 'PROVINCIA' THEN 1 WHEN 'CANTON' THEN 2 WHEN 'PARROQUIA' THEN 3 END) STORED NOT NULL,
 	CONSTRAINT pk_dpa_inec PRIMARY KEY (pk_dpa),
 	CONSTRAINT ck_dpa_inec_tipo_codigo CHECK ((tipo_dpa='PROVINCIA' AND pk_dpa ~ '^[0-9]{2}$') OR (tipo_dpa='CANTON' AND pk_dpa ~ '^[0-9]{4}$') OR (tipo_dpa='PARROQUIA' AND pk_dpa ~ '^[0-9]{6}$')),
 	CONSTRAINT ck_dpa_inec_descripcion CHECK (length(btrim(descripcion_dpa))>0)
 );
 LOCK TABLE catalogos.dpa_inec IN SHARE ROW EXCLUSIVE MODE;
+ALTER TABLE catalogos.dpa_inec ADD COLUMN IF NOT EXISTS orden_dpa SMALLINT GENERATED ALWAYS AS (CASE tipo_dpa WHEN 'PROVINCIA' THEN 1 WHEN 'CANTON' THEN 2 WHEN 'PARROQUIA' THEN 3 END) STORED NOT NULL;
 DO $estructura$ BEGIN
  IF (SELECT count(*) FROM pg_catalog.pg_constraint WHERE conrelid='catalogos.dpa_inec'::regclass
   AND conname IN ('pk_dpa_inec','ck_dpa_inec_tipo_codigo','ck_dpa_inec_descripcion')
@@ -26,11 +28,13 @@ DO $estructura$ BEGIN
   RAISE EXCEPTION 'Faltan restricciones validadas del catálogo';
  END IF;
  IF (SELECT count(*) FROM pg_catalog.pg_attribute WHERE attrelid='catalogos.dpa_inec'::regclass
-  AND attnum>0 AND NOT attisdropped)<>3 OR
+  AND attnum>0 AND NOT attisdropped)<>4 OR
  (SELECT count(*) FROM pg_catalog.pg_attribute a JOIN (VALUES
-  ('pk_dpa','character varying(6)'),('tipo_dpa','character varying(19)'),('descripcion_dpa','text')) e(nombre,tipo)
+  ('pk_dpa','character varying(6)'),('tipo_dpa','character varying(19)'),('descripcion_dpa','text'),('orden_dpa','smallint')) e(nombre,tipo)
   ON a.attname=e.nombre AND pg_catalog.format_type(a.atttypid,a.atttypmod)=e.tipo
-  WHERE a.attrelid='catalogos.dpa_inec'::regclass AND a.attnotnull AND NOT a.attisdropped)<>3 THEN
+  WHERE a.attrelid='catalogos.dpa_inec'::regclass AND a.attnotnull AND NOT a.attisdropped)<>4 OR
+ NOT EXISTS (SELECT 1 FROM pg_catalog.pg_attribute WHERE attrelid='catalogos.dpa_inec'::regclass
+  AND attname='orden_dpa' AND attgenerated='s' AND NOT attisdropped) THEN
   RAISE EXCEPTION 'Estructura existente distinta del mapeo; requiere migración explícita';
  END IF;
 END $estructura$;
@@ -1605,6 +1609,7 @@ COMMENT ON TABLE catalogos.dpa_inec IS 'INEC CGE 2026, corte 2025-12-31; código
 COMMENT ON COLUMN catalogos.dpa_inec.pk_dpa IS 'Código oficial DPA como texto: provincia 2, cantón 4, parroquia/cabecera 6 dígitos. Conserva ceros iniciales.';
 COMMENT ON COLUMN catalogos.dpa_inec.tipo_dpa IS 'Nivel del código: PROVINCIA, CANTON o PARROQUIA. El nivel parroquial incluye cabeceras cantonales, rurales y urbanas.';
 COMMENT ON COLUMN catalogos.dpa_inec.descripcion_dpa IS 'Denominación oficial de las hojas detalladas PROVINCIAS, CANTONES y PARROQUIAS del Excel INEC 2026.';
+COMMENT ON COLUMN catalogos.dpa_inec.orden_dpa IS 'Orden calculado: 1 PROVINCIA, 2 CANTON, 3 PARROQUIA. Consultar con ORDER BY orden_dpa,pk_dpa.';
 DO $check$ BEGIN
  IF (SELECT count(*) FROM catalogos.dpa_inec)<>1562 THEN
   RAISE EXCEPTION 'Conteo distinto de la entrega; no se borran filas ajenas';
@@ -1613,6 +1618,8 @@ DO $check$ BEGIN
   (h.tipo_dpa<>'PROVINCIA' AND NOT EXISTS (SELECT 1 FROM catalogos.dpa_inec p WHERE p.pk_dpa=left(h.pk_dpa,2) AND p.tipo_dpa='PROVINCIA')) OR
   (h.tipo_dpa='PARROQUIA' AND NOT EXISTS (SELECT 1 FROM catalogos.dpa_inec p WHERE p.pk_dpa=left(h.pk_dpa,4) AND p.tipo_dpa='CANTON')))
  THEN RAISE EXCEPTION 'Falta provincia o cantón padre'; END IF;
+ IF EXISTS (SELECT 1 FROM catalogos.dpa_inec WHERE orden_dpa IS DISTINCT FROM (CASE tipo_dpa WHEN 'PROVINCIA' THEN 1 WHEN 'CANTON' THEN 2 WHEN 'PARROQUIA' THEN 3 END))
+ THEN RAISE EXCEPTION 'Orden distinto del nivel territorial'; END IF;
 END $check$;
-SELECT tipo_dpa,count(*) AS registros FROM catalogos.dpa_inec GROUP BY tipo_dpa ORDER BY tipo_dpa;
+SELECT orden_dpa,tipo_dpa,count(*) AS registros FROM catalogos.dpa_inec GROUP BY orden_dpa,tipo_dpa ORDER BY orden_dpa;
 COMMIT;
