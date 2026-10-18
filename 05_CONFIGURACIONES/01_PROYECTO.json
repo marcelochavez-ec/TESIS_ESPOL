@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "aliases_etiquetas": {
     "f3_desarrollo_inf": {
       "relacion_cuidadora": "relacion_cuidador",
@@ -66,13 +66,8 @@
   "diccionarios": [
     {
       "archivo": "07_DICCIONARIO_ENDI.xlsx",
-      "nombre_original": "Diccionario_ENDI.xlsx",
-      "sha256": "eaf7e644d8fb3eac24e24e7b55ba64d42524451c97a9aa21b023de08a9d02ffc"
-    },
-    {
-      "archivo": "08_DICCIONARIO_DESARROLLO_INFANTIL.xlsx",
-      "nombre_original": "Diccionario_ENDI_di.xlsx",
-      "sha256": "e758de454b4898ba4b4062fda3c59a7ccbca89c725e5e1d8a88be8e30f14090d"
+      "nombre_original": "07_DICCIONARIO_ENDI.xlsx",
+      "sha256": "4ffaab0a21762b5038f7ce322c2a71fc376d0eaefab3247d616c8efa31ebde06"
     }
   ],
   "documentos": [

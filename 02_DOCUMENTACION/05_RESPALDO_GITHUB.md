@@ -28,7 +28,7 @@ Set-Location .\TESIS_ESPOL
 git config --local core.excludesFile (Join-Path (Get-Location).Path '05_CONFIGURACIONES\.gitignore')
 ```
 
-5. El autor recupera por separado la carpeta 01_DATOS_FUENTE con los seis RDS y los dos diccionarios del manifiesto 05_CONFIGURACIONES/01_PROYECTO.json. Conserva nombres y bytes originales. Estas entradas no están en GitHub. Los tres PDF metodológicos sí se recuperan del repositorio. La carpeta 02_DOCUMENTACION debe permitir escritura para los resultados.
+5. El autor recupera por separado la carpeta 01_DATOS_FUENTE con los seis RDS y el Excel 07 consolidado del manifiesto versión 2 05_CONFIGURACIONES/01_PROYECTO.json. Conserva nombres y bytes originales. Estas entradas no están en GitHub. Los tres PDF metodológicos sí se recuperan del repositorio. La carpeta 02_DOCUMENTACION debe permitir escritura para los resultados.
 
 6. Se verifica que Git excluya las fuentes.
 
@@ -54,7 +54,7 @@ git check-ignore --no-index -v -- 02_DOCUMENTACION/09_VALIDACIONES/12_RECARGA_PO
 $env:PGHOST_CONTENEDOR = 'SERVIDOR_POSTGRESQL'
 ```
 
-10. El autor inicia Docker Desktop en modo Linux y ejecuta la carga completa desde la raíz. Se construye el entorno espol con las versiones fijadas, se validan las fuentes y el mapeo y se sustituyen exclusivamente las seis tablas de research_lab.endi. La consola solicita la clave de PostgreSQL si no fue proporcionada mediante un mecanismo externo. Los detalles y efectos se describen en 07_MODULOS/06_RECARGA_POSTGRESQL.md.
+10. El autor inicia Docker Desktop en modo Linux y ejecuta la carga completa desde la raíz. Se construye el entorno espol con las versiones fijadas, se validan las fuentes y el mapeo y se sustituyen las seis fuentes de research_lab.endi y se sincronizan el diccionario, sus vínculos y comentarios. La consola solicita la clave de PostgreSQL si no fue proporcionada mediante un mecanismo externo. Los detalles y efectos se describen en 07_MODULOS/06_RECARGA_POSTGRESQL.md.
 
 ```powershell
 docker compose -f 05_CONFIGURACIONES/compose.yaml run --build --rm recarga

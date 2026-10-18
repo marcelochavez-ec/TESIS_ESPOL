@@ -172,10 +172,12 @@ def recargar_fuentes_postgresql(raiz, *, esquema='endi', sobrescribir=False, sol
             version = conexion.exec_driver_sql('SHOW server_version').scalar_one()
             tablas = mapeo.recargar_tablas(conexion, esquema, fuentes, sobrescribir=True)
             relaciones = modelo.aplicar_modelo(conexion, esquema)
+            diccionario = import_module('07_DICCIONARIO_VARIABLES').cargar_diccionario(raiz, conexion, esquema)
         return {'base': base, 'esquema': esquema, 'tablas': tablas,
                 'version_postgresql': version,
                 'recarga_confirmada': True, 'constraints_creados': True,
                 'modelo_relacional': relaciones,
+                'diccionario': diccionario,
                 'otras_tablas_modificadas': False}
     finally:
         motor.dispose()

@@ -12,7 +12,7 @@ from pandas.api import types as pt
 import pyreadr
 from sqlalchemy import (
     BigInteger, Boolean, Column, Date, DateTime, Double, Integer, MetaData,
-    Numeric, SmallInteger, Table, Unicode, inspect, func, select, text,
+    Numeric, SmallInteger, Table, Text, Unicode, inspect, func, select, text,
 )
 from sqlalchemy.dialects import postgresql
 from psycopg import sql
@@ -66,7 +66,7 @@ def _tipo_declarado(declaracion):
     clases = {
         'DATE': Date, 'TIMESTAMP': DateTime, 'BOOLEAN': Boolean,
         'SMALLINT': SmallInteger, 'INTEGER': Integer, 'BIGINT': BigInteger,
-        'DOUBLE': Double, 'DOUBLE PRECISION': Double, 'NUMERIC': Numeric,
+        'DOUBLE': Double, 'DOUBLE PRECISION': Double, 'NUMERIC': Numeric, 'TEXT': Text,
     }
     if nombre == 'TIMESTAMPTZ':
         return DateTime(timezone=True), especificacion
@@ -126,12 +126,14 @@ def _convertir(serie, tipo, especificacion, margen):
         return objeto.where(serie.notna(), None), tipo
     if not especificacion and isinstance(tipo, Double):
         return serie.copy(), tipo
-    if isinstance(tipo, Unicode):
+    if isinstance(tipo, (Unicode, Text)):
         convertida = serie.map(lambda v: None if pd.isna(v) else str(v))
         presentes = convertida.dropna()
         longitud = max(map(len, presentes), default=0)
         if any('\x00' in v for v in presentes):
-            raise ValueError(f'{serie.name}: PostgreSQL no admite NUL dentro de VARCHAR.')
+            raise ValueError(f'{serie.name}: PostgreSQL no admite NUL dentro de texto.')
+        if isinstance(tipo, Text):
+            return convertida, tipo
         if tipo.length is None:
             tipo = Unicode(longitud + margen)
         if longitud > tipo.length:
@@ -233,7 +235,7 @@ def mapear_dataframe(df, declaraciones=None, margen=10):
             'tipo_sql': str(tipo.compile(dialect=postgresql.dialect())),
             'criterio': 'declarado' if especificacion else 'inferido',
             'nulos': int(serie.isna().sum()),
-            'longitud_observada': max(map(len, convertida.dropna()), default=0) if isinstance(tipo, Unicode) else None,
+            'longitud_observada': max(map(len, convertida.dropna()), default=0) if isinstance(tipo, (Unicode, Text)) else None,
             'longitud_declarada': tipo.length if isinstance(tipo, Unicode) else None,
         })
     # Construir de una sola vez evita fragmentar DataFrames de cientos de columnas.

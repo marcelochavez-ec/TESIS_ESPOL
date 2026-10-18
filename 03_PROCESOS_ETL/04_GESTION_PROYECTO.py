@@ -157,7 +157,7 @@ def reproducir():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('accion', choices=['inventariar', 'verificar-fuentes', 'pruebas', 'reproducir', 'ejecutar'])
-    parser.add_argument('--sobrescribir-fuentes', action='store_true', help='Reemplaza exclusivamente las seis tablas fuente en research_lab.endi.')
+    parser.add_argument('--sobrescribir-fuentes', action='store_true', help='Reemplaza las seis fuentes y sincroniza su diccionario en research_lab.endi.')
     argumentos = parser.parse_args()
     accion = argumentos.accion
     if argumentos.sobrescribir_fuentes and accion != 'ejecutar':
@@ -173,7 +173,7 @@ def main():
             RAIZ, esquema=config['postgresql']['esquema'], sobrescribir=True, solicitar_clave=True,
         )
         guardar_json(RAIZ/config['rutas']['validaciones']/'12_RECARGA_POSTGRESQL.json', resultado)
-        print('3/3 Recarga confirmada: filas, tipos, nulos, PK, FK y restricciones verificados.', flush=True)
+        print('3/3 Recarga confirmada: fuentes, relaciones, diccionario y comentarios verificados.', flush=True)
         print(json.dumps(resultado, ensure_ascii=False, indent=2))
         inventariar()
         return

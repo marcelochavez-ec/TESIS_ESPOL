@@ -41,3 +41,5 @@ conda run -n espol python -B 03_PROCESOS_ETL/06_CONFIGURAR_DBEAVER.py --verifica
 ```
 
 Después se abre DBeaver y se muestra el diagrama de endi. La verificación en archivo no sustituye comprobar visualmente una sesión que todavía conserve el ajuste anterior.
+
+18. **Metadatos del diccionario.** El esquema también contiene las dos tablas de metadatos descritas en 10_DICCIONARIO_VARIABLES.md. Sus PK/FK permiten navegar entre variable local y variable referenciada; las etiquetas también se consultan como comentarios de las columnas originales. Refrescar los metadatos del cliente después de la carga.

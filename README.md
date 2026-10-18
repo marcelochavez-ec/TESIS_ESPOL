@@ -49,6 +49,7 @@ La preparación de datos implementada no equivale a resultados estadísticos de 
 | Ejecutar la recarga de las seis tablas | [Módulo de recarga](02_DOCUMENTACION/07_MODULOS/06_RECARGA_POSTGRESQL.md) |
 | Revisar claves, relaciones y diagrama | [Modelo entidad-relación](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md) |
 | Ver el diagrama compacto en DBeaver | [Configuración de DBeaver](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) |
+| Consultar etiquetas y claves de cada variable | [Diccionario en PostgreSQL](02_DOCUMENTACION/07_MODULOS/10_DICCIONARIO_VARIABLES.md) |
 | Trabajar con el agente del proyecto | [AGENTS.md](04_AGENTES_SKILLS/AGENTS.md) |
 
 ```text
@@ -62,7 +63,7 @@ TESIS_ESPOL/
 │   ├── 08_MAPEO_ENDI/              # Catálogo de variables y SQL
 │   └── 09_VALIDACIONES/            # Evidencias de ejecución; solo locales
 ├── 03_PROCESOS_ETL/
-│   ├── 01–06 · Scripts Python
+│   ├── 01–07 · Scripts Python
 │   └── 05_PRUEBAS/                 # Suite de desarrollo; solo local
 ├── 04_AGENTES_SKILLS/
 │   ├── AGENTS.md
@@ -87,8 +88,7 @@ TESIS_ESPOL/
 | `04_BDD_ENDI_R2_F2_LACTANCIA.rds` | Lactancia materna; origen de `endi.f2_lactancia`. |
 | `05_BDD_ENDI_R2_F2_SALUD_NINEZ.rds` | Salud de menores de cinco años; origen de `endi.f2_salud_ninez`. |
 | `06_BDD_ENDI_R2_F3_DESARROLLO_INFANTIL.rds` | Desarrollo infantil; origen de `endi.f3_desarrollo_inf`. |
-| `07_DICCIONARIO_ENDI.xlsx` | Nombres y etiquetas de variables de los formularios 1 y 2. |
-| `08_DICCIONARIO_DESARROLLO_INFANTIL.xlsx` | Nombres y etiquetas de variables del formulario 3. |
+| `07_DICCIONARIO_ENDI.xlsx` | Diccionario consolidado de los formularios 1, 2 y 3: seis hojas y 1.423 variables; entrega aprobada del manifiesto versión 2. |
 
 ### 3.2. `02_DOCUMENTACION` · Fuentes metodológicas y guías
 
@@ -114,6 +114,7 @@ TESIS_ESPOL/
 | [07_MODELO_ENTIDAD_RELACION.md](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md) | Diagrama, PK, FK, UNIQUE, CHECK y excepciones de población. |
 | [08_PORTADA_Y_CATALOGO.md](02_DOCUMENTACION/07_MODULOS/08_PORTADA_Y_CATALOGO.md) | Mantenimiento del README, biografía, identidad visual y navegación. |
 | [09_DBEAVER_COMPACTO.md](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) | Preferencia visual para mostrar claves y relaciones sin desplegar todas las columnas. |
+| [10_DICCIONARIO_VARIABLES.md](02_DOCUMENTACION/07_MODULOS/10_DICCIONARIO_VARIABLES.md) | Tabla única de etiquetas, vínculos PK/FK/CHECK/UNIQUE/NOT NULL, comentarios y consultas SQL. |
 
 #### `08_MAPEO_ENDI` · Catálogo y SQL reproducible
 
@@ -123,6 +124,8 @@ TESIS_ESPOL/
 | [02_RESUMEN_MAPEO.json](02_DOCUMENTACION/08_MAPEO_ENDI/02_RESUMEN_MAPEO.json) | Resumen del mapeo, filas y columnas por fuente. |
 | [03_TIPOS_POSTGRESQL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/03_TIPOS_POSTGRESQL.sql) | Propuesta de columnas y tipos; el mapeo independiente no ejecuta este archivo. |
 | [04_RESTRICCIONES_POSTGRESQL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/04_RESTRICCIONES_POSTGRESQL.sql) | SQL transaccional del modelo relacional: claves, restricciones e índices. |
+| [05_DICCIONARIO_POSTGRESQL.sql](02_DOCUMENTACION/08_MAPEO_ENDI/05_DICCIONARIO_POSTGRESQL.sql) | Estructura del diccionario, tabla de vínculos, validaciones y vista de consulta. |
+| [06_MAPEO_DICCIONARIO.csv](02_DOCUMENTACION/08_MAPEO_ENDI/06_MAPEO_DICCIONARIO.csv) | Tipos y longitudes de los campos de las dos tablas de metadatos. |
 
 <details>
 <summary><strong>09_VALIDACIONES · Archivo por archivo de las evidencias locales</strong></summary>
@@ -151,6 +154,11 @@ Esta carpeta está excluida de GitHub. Los archivos siguientes describen verific
 | `19_RECARGA_CON_MODELO.txt` | Registro de carga y modelo desde Windows/Conda. |
 | `20_CONTENEDOR_CON_MODELO.txt` | Registro de construcción y carga con el modelo desde Docker. |
 | `21_REPETICION_MODELO.json` | Comparación de datos y restricciones entre Windows y Docker. |
+| `22_CARGA_DICCIONARIO.txt` | Resultado de la carga inicial del Excel consolidado en PostgreSQL. |
+| `23_PRUEBAS_DICCIONARIO.txt` | Integridad de TEXT, etiquetas, FK y constraint triggers de metadatos. |
+| `24_ETL_CON_DICCIONARIO.txt` | Registro del ETL completo con modelo y diccionario. |
+| `25_REPETICION_DICCIONARIO.json` | Comparación de fuentes, modelo y diccionario entre Windows y Docker. |
+| `26_CONTENEDOR_DICCIONARIO.txt` | Construcción y ejecución de la distribución con diccionario. |
 
 </details>
 
@@ -164,6 +172,7 @@ Esta carpeta está excluida de GitHub. Los archivos siguientes describen verific
 | [04_GESTION_PROYECTO.py](03_PROCESOS_ETL/04_GESTION_PROYECTO.py) | Punto de entrada: inventario, integridad, reproducción y recarga completa. |
 | [05_MODELO_RELACIONAL.py](03_PROCESOS_ETL/05_MODELO_RELACIONAL.py) | Genera, aplica y verifica el modelo relacional dentro de una transacción. |
 | [06_CONFIGURAR_DBEAVER.py](03_PROCESOS_ETL/06_CONFIGURAR_DBEAVER.py) | Configura o verifica KEYS en el workspace del cliente DBeaver del anfitrión; no modifica PostgreSQL. |
+| [07_DICCIONARIO_VARIABLES.py](03_PROCESOS_ETL/07_DICCIONARIO_VARIABLES.py) | Carga el Excel 07, sincroniza etiquetas y restricciones y comenta las columnas físicas. |
 
 <details>
 <summary><strong>05_PRUEBAS · Archivos locales de desarrollo</strong></summary>
@@ -175,6 +184,7 @@ Esta carpeta no se publica. Su ausencia en GitHub no se contabiliza como pruebas
 | `01_PRUEBAS_MAPEO.py` | Tipos, fechas, códigos, precisión y comparación con referencias aprobadas. |
 | `02_PRUEBAS_RECARGA.py` | Integración PostgreSQL: COPY, repetición y reversión ante fallos. |
 | `03_PRUEBAS_MODELO.py` | PK/FK/CHECK/NOT NULL, casos especiales y aplicación repetida del modelo. |
+| `04_PRUEBAS_DICCIONARIO.py` | Textos largos, cobertura, carga repetida y rechazo de vínculos de metadatos incorrectos. |
 
 </details>
 
@@ -227,12 +237,27 @@ El modelo incluye **6 PK, 12 FK, 7 UNIQUE y 11 CHECK**, además de NOT NULL e í
 
 Los cuidadores se vinculan con Personas y no necesariamente con MEF. Las excepciones, cardinalidades y el diagrama completo se consultan en el [modelo entidad-relación](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md).
 
+### Diccionario consultable en PostgreSQL
+
+El Excel 07 alimenta **una sola tabla de diccionario**, `endi.diccionario_variables`: 1.423 entradas del Excel y una columna derivada. La tabla auxiliar `endi.diccionario_restricciones` vincula cada variable con sus restricciones reales y con la variable referenciada cuando es FK. Los enlaces entre metadatos tienen PK/FK y se contrastan con los catálogos nativos mediante constraint triggers. Las etiquetas se conservan como TEXT y también como comentarios de columnas.
+
+La siguiente consulta muestra qué significa cada variable y si participa en claves:
+
+```sql
+SELECT tabla, variable, etiqueta, tipo_postgresql, es_pk, es_fk, restricciones
+FROM endi.v_diccionario_variables
+WHERE tabla = 'f1_personas'
+ORDER BY posicion;
+```
+
+El [módulo del diccionario](02_DOCUMENTACION/07_MODULOS/10_DICCIONARIO_VARIABLES.md) explica el modelo de metadatos, los vínculos y las consultas. Las seis fuentes conservan sus 177.439 filas; las dos tablas adicionales contienen documentación del esquema, no copias de microdatos.
+
 ## 5. Ejecución desde una copia de GitHub
 
 ### Requisitos
 
 1. Git y Docker con contenedores Linux/amd64 o emulación compatible.
-2. Las ocho entradas originales de `01_DATOS_FUENTE`, recuperadas por separado y con los hashes del manifiesto.
+2. Las siete entradas aprobadas de `01_DATOS_FUENTE` (seis RDS y el Excel 07 consolidado), recuperadas por separado y con los hashes del manifiesto.
 3. PostgreSQL accesible con la base `research_lab`, el esquema `endi` y permisos para sustituir las seis tablas.
 4. Credenciales suministradas fuera del repositorio y permisos de escritura en `02_DOCUMENTACION`.
 
@@ -258,7 +283,7 @@ git config --local core.excludesFile (Join-Path (Get-Location).Path '05_CONFIGUR
 
 4. Se recupera la carpeta `01_DATOS_FUENTE` desde su respaldo independiente y se inicia Docker. La configuración predeterminada conecta con PostgreSQL del mismo equipo mediante `host.docker.internal`; si el servidor es otro, se configura `PGHOST_CONTENEDOR` como explica la [receta](02_DOCUMENTACION/05_RESPALDO_GITHUB.md).
 
-5. Se ejecuta el flujo completo. **Este comando sustituye las seis tablas fuente y recrea sus relaciones.** Solicita la contraseña si no se proporcionó mediante un mecanismo externo. Si falla una validación SQL antes del commit, se revierte la tanda completa.
+5. Se ejecuta el flujo completo. **Este comando sustituye las seis tablas fuente, recrea sus relaciones y sincroniza el diccionario y sus comentarios.** Solicita la contraseña si no se proporcionó mediante un mecanismo externo. Si falla una validación SQL antes del commit, se revierte la tanda completa.
 
 ```powershell
 docker compose -f 05_CONFIGURACIONES/compose.yaml run --build --rm recarga
