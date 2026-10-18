@@ -13,7 +13,7 @@
 1. Usa el entorno `espol` con Python 3.15.0. `05_CONFIGURACIONES/requirements.txt` es la única lista de versiones Python; no crear requirements alternativos ni archivos freeze paralelos.
 2. Usa `05_CONFIGURACIONES/environment.yml` para crear el entorno y `Dockerfile`/`compose.yaml` para Linux. Lee `02_DOCUMENTACION/07_MODULOS/05_REPRODUCIBILIDAD.md` antes de cambiar dependencias.
 3. Los nombres, tablas, hashes fuente, rutas y valores predeterminados de conexión están en `01_PROYECTO.json`. No reintroduzcas rutas personales, DATA/INEC ni nombres antiguos en código.
-4. Los scripts son `01_ETL_FUENTES.py` (mapeo ENDI), `02_MAPEO_POSTGRESQL.py` (biblioteca común), `03_VERIFICAR_ENTORNO.py` (versiones y pruebas técnicas), `04_GESTION_PROYECTO.py` (integridad, inventario y reproducción) y `05_MODELO_RELACIONAL.py` (PK, FK, UNIQUE, CHECK y SQL del modelo). Las pruebas están en `05_PRUEBAS/`.
+4. Los scripts son `01_ETL_FUENTES.py` (mapeo ENDI), `02_MAPEO_POSTGRESQL.py` (biblioteca común), `03_VERIFICAR_ENTORNO.py` (versiones y pruebas técnicas), `04_GESTION_PROYECTO.py` (integridad, inventario y reproducción), `05_MODELO_RELACIONAL.py` (PK, FK, UNIQUE, CHECK y SQL del modelo) y `06_CONFIGURAR_DBEAVER.py` (preferencia visual del cliente, fuera de la recarga ETL). Las pruebas están en `05_PRUEBAS/`.
 5. Cualquier nueva carga tabular debe pasar por `mapear_dataframe` y usar sus tipos explícitos. DATE para fechas completas; TIMESTAMP conserva hora/zona; VARCHAR con longitud observada más 10 caracteres por defecto; enteros por rango; DOUBLE para reales; NUMERIC para decimales exactos. No reinterpretar identificadores o textos con aspecto de fecha sin declaración explícita.
 6. No convertir año, mes y día separados en DATE ni borrar códigos 99/9999. No perder ceros iniciales, valores especiales, categorías o registros. Conservar nulos.
 7. Importar módulos no debe leer fuentes ni escribir tablas. El CLI 01 solo genera metadatos y SQL de revisión. El almacenamiento individual rechaza tablas existentes. La recarga por lote requiere autorización explícita, remapea antes de DROP/CREATE/COPY, no usa CASCADE y se confirma como una sola transacción después de validar filas, tipos, nulos y aplicar/verificar 05_MODELO_RELACIONAL.py.
@@ -51,3 +51,8 @@ Lee solo la skill pertinente:
 
 1. El autor es Marcelo Chávez, CEO de ConneXData. Su perfil público es https://www.linkedin.com/in/marcelochavezec/. Usar únicamente datos biográficos confirmados y la marca ConneXData; no añadir grados académicos o experiencias no verificadas.
 2. La portada usa 06_IMG/ConneXData.jpeg. No incorporar el logo de ESPOL por indicación del autor. Mantener README.md, los enlaces relativos y el catálogo por archivo al cambiar la estructura. La documentación de esta presentación está en 02_DOCUMENTACION/07_MODULOS/08_PORTADA_Y_CATALOGO.md.
+
+## 7. Vista de DBeaver
+
+1. Para limitar el diagrama a claves y relaciones usa erd.attr.visibility=KEYS mediante 06_CONFIGURAR_DBEAVER.py en el anfitrión. Lee 02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md; la preferencia es local al workspace y no cambia el esquema PostgreSQL.
+2. Guardar y verificar el archivo de preferencias no demuestra que una sesión abierta ya lo haya aplicado. Indicar el reinicio y no cerrar consultas sin guardar ni ejecutar editores ajenos a la tarea. No versionar las conexiones ni credenciales privadas de DBeaver.

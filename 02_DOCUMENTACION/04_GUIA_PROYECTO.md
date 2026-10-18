@@ -30,3 +30,5 @@ docker compose -f 05_CONFIGURACIONES/compose.yaml run --build --rm recarga
 19. **Portada pública.** [README.md](../README.md) presenta a Marcelo Chávez, CEO de ConneXData, con su [perfil LinkedIn](https://www.linkedin.com/in/marcelochavezec/), contexto de la tesis y catálogo de carpetas y archivos. El mantenimiento se documenta en 07_MODULOS/08_PORTADA_Y_CATALOGO.md.
 
 20. **Identidad visual.** 06_IMG/ConneXData.jpeg contiene la imagen proporcionada por el autor y se publica para utilizarla en la portada. No se utiliza el logo de ESPOL. La estructura tiene seis carpetas numeradas; README es la única excepción de presentación en la raíz.
+
+21. **Diagrama compacto.** 03_PROCESOS_ETL/06_CONFIGURAR_DBEAVER.py guarda o verifica erd.attr.visibility=KEYS en el workspace local de DBeaver. Muestra las claves para revisar relaciones, sin alterar las variables de PostgreSQL. Se documentan reinicio, menú Any keys y configuración reproducible en 07_MODULOS/09_DBEAVER_COMPACTO.md.

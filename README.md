@@ -48,6 +48,7 @@ La preparación de datos implementada no equivale a resultados estadísticos de 
 | Preparar Conda y Docker | [Reproducibilidad](02_DOCUMENTACION/07_MODULOS/05_REPRODUCIBILIDAD.md) |
 | Ejecutar la recarga de las seis tablas | [Módulo de recarga](02_DOCUMENTACION/07_MODULOS/06_RECARGA_POSTGRESQL.md) |
 | Revisar claves, relaciones y diagrama | [Modelo entidad-relación](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md) |
+| Ver el diagrama compacto en DBeaver | [Configuración de DBeaver](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) |
 | Trabajar con el agente del proyecto | [AGENTS.md](04_AGENTES_SKILLS/AGENTS.md) |
 
 ```text
@@ -61,7 +62,7 @@ TESIS_ESPOL/
 │   ├── 08_MAPEO_ENDI/              # Catálogo de variables y SQL
 │   └── 09_VALIDACIONES/            # Evidencias de ejecución; solo locales
 ├── 03_PROCESOS_ETL/
-│   ├── 01–05 · Scripts Python
+│   ├── 01–06 · Scripts Python
 │   └── 05_PRUEBAS/                 # Suite de desarrollo; solo local
 ├── 04_AGENTES_SKILLS/
 │   ├── AGENTS.md
@@ -112,6 +113,7 @@ TESIS_ESPOL/
 | [06_RECARGA_POSTGRESQL.md](02_DOCUMENTACION/07_MODULOS/06_RECARGA_POSTGRESQL.md) | Sustitución transaccional de las seis tablas y verificaciones de carga. |
 | [07_MODELO_ENTIDAD_RELACION.md](02_DOCUMENTACION/07_MODULOS/07_MODELO_ENTIDAD_RELACION.md) | Diagrama, PK, FK, UNIQUE, CHECK y excepciones de población. |
 | [08_PORTADA_Y_CATALOGO.md](02_DOCUMENTACION/07_MODULOS/08_PORTADA_Y_CATALOGO.md) | Mantenimiento del README, biografía, identidad visual y navegación. |
+| [09_DBEAVER_COMPACTO.md](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md) | Preferencia visual para mostrar claves y relaciones sin desplegar todas las columnas. |
 
 #### `08_MAPEO_ENDI` · Catálogo y SQL reproducible
 
@@ -161,6 +163,7 @@ Esta carpeta está excluida de GitHub. Los archivos siguientes describen verific
 | [03_VERIFICAR_ENTORNO.py](03_PROCESOS_ETL/03_VERIFICAR_ENTORNO.py) | Comprueba versiones y operaciones técnicas; dispone de verificación SQL de lectura. |
 | [04_GESTION_PROYECTO.py](03_PROCESOS_ETL/04_GESTION_PROYECTO.py) | Punto de entrada: inventario, integridad, reproducción y recarga completa. |
 | [05_MODELO_RELACIONAL.py](03_PROCESOS_ETL/05_MODELO_RELACIONAL.py) | Genera, aplica y verifica el modelo relacional dentro de una transacción. |
+| [06_CONFIGURAR_DBEAVER.py](03_PROCESOS_ETL/06_CONFIGURAR_DBEAVER.py) | Configura o verifica KEYS en el workspace del cliente DBeaver del anfitrión; no modifica PostgreSQL. |
 
 <details>
 <summary><strong>05_PRUEBAS · Archivos locales de desarrollo</strong></summary>
@@ -268,6 +271,16 @@ docker compose -f 05_CONFIGURACIONES/compose.yaml run --build --rm mapeo
 ```
 
 La alternativa de Conda, los requisitos de UID/GID en Linux y la conservación de la imagen están explicados en [reproducibilidad](02_DOCUMENTACION/07_MODULOS/05_REPRODUCIBILIDAD.md). El escenario comprobado utiliza Windows como anfitrión, PostgreSQL 18.3 y un contenedor Linux/amd64. Otro equipo debe aportar las mismas entradas y cumplir los requisitos indicados.
+
+### Diagrama compacto en DBeaver
+
+Para visualizar las relaciones de ENDI sin desplegar todas las variables, se utiliza **Show Attributes → Any keys**. El ajuste reproducible se aplica en el anfitrión donde está DBeaver. El autor guarda sus consultas, cierra DBeaver y ejecuta:
+
+```powershell
+conda run -n espol python -B 03_PROCESOS_ETL/06_CONFIGURAR_DBEAVER.py
+```
+
+Después abre DBeaver y el diagrama del esquema endi. Si el diagrama conserva una opción particular, selecciona Show Attributes → Any keys en su menú contextual. Los pasos y límites de verificación están en [DBeaver compacto](02_DOCUMENTACION/07_MODULOS/09_DBEAVER_COMPACTO.md).
 
 ## 6. Qué se publica y qué permanece local
 
