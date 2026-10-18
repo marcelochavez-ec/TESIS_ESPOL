@@ -53,3 +53,5 @@ conda run --no-capture-output -n espol python -B 03_PROCESOS_ETL/04_GESTION_PROY
 17. **Etapa posterior.** Las relaciones y constraints se diseñarán tras revisar el catálogo completo y el manual ENDI. Cualquier incorporación deberá coordinarse con esta recarga de fuentes antes de depender de índices o restricciones añadidos manualmente.
 
 18. **Distribución.** Las pruebas y los reportes 09_VALIDACIONES permanecen en el equipo y no se publican. Una copia de GitHub genera sus propios reportes y verifica fuentes, entorno y mapeo aprobado; indica expresamente la ausencia de suite local, sin inventar una aprobación. Los scripts de recarga sí se publican.
+
+19. **Recuperación real desde GitHub.** Se clonó y ejecutó el commit a5cfd41a6d43b8c801376c7c983dd7640df7f061 en el host Windows, con las fuentes recuperadas por separado y la imagen reconstruida. La carga completa obtuvo las mismas seis tablas, filas, tipos, nulos y huellas que la ejecución local. Se comprobó este escenario con PostgreSQL 18.3 y Docker Linux/amd64; otros equipos deben cumplir los requisitos de entradas, permisos, servidor y arquitectura descritos.
