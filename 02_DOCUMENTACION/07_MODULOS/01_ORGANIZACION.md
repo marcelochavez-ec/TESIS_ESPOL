@@ -1,0 +1,19 @@
+# ORGANIZACIÓN E INVENTARIO
+
+1. **Objetivo.** Mantener todos los archivos dentro de cinco carpetas y un inventario global, con nombres numerados y referencias consistentes.
+2. **Archivos.** `05_CONFIGURACIONES/01_PROYECTO.json` controla fuentes y rutas; `03_PROCESOS_ETL/04_GESTION_PROYECTO.py` genera `02_DOCUMENTACION/06_INVENTARIO_PROYECTO.csv`. La guía general está en `02_DOCUMENTACION/04_GUIA_PROYECTO.md`.
+3. **Estructura.** Las fuentes están en 01, documentación en 02, procesos en 03, agente/skills en 04 y configuración en 05. Los scripts son 01_ETL_FUENTES, 02_MAPEO_POSTGRESQL, 03_VERIFICAR_ENTORNO y 04_GESTION_PROYECTO; las pruebas están en 05_PRUEBAS.
+4. **Flujo.** Se consulta el manifiesto, se comprueban hashes de las fuentes, se ejecuta la tarea, se actualiza la documentación y al final se regenera el inventario. El inventario no se trata como un archivo estático que seguirá vigente tras cualquier cambio.
+5. **Entradas.** Archivos presentes y manifiesto del proyecto. La función inventariar() no recibe parámetros; toma la raíz desde la ubicación del script, no desde una ruta del equipo ni el directorio actual.
+6. **Salidas.** Un CSV global con NUMERO, RUTA, NOMBRE_ORIGINAL, BYTES, SHA256, CLASE y CONTROL. Todas las rutas son relativas y usan separadores portables.
+7. **Fuentes y conservación.** Se renombraron seis RDS, dos XLSX y tres PDF sin cambiar su contenido. Sus nombres originales y hashes esperados están en el manifiesto. No se utiliza ninguna tabla SQL para el inventario.
+8. **Reglas.** Se incluye cada archivo del proyecto; se omiten metadatos internos .git. La fila del propio inventario no lleva tamaño/hash porque calcularlo alteraría el contenido que se intenta resumir. Las demás filas llevan SHA-256.
+9. **UI.** No aplica. La gestión es por consola y archivos Markdown/CSV.
+10. **Server y funciones.** verificar_fuentes() compara los once archivos originales; inventariar() registra archivos actuales y sobrescribe únicamente el inventario generado. guardar_json() escribe reportes con orden de claves y saltos LF.
+11. **SQL/ETL.** La organización no crea tablas ni relaciones. El mapeo se documenta aparte en 03_MAPEO_VARIABLES.md.
+12. **Dependencias.** Python estándar para hashes e inventario; Conda y paquetes fijados para ejecutar la reproducción completa.
+13. **Validaciones.** Se comprobaron once hashes originales, raíz con cinco carpetas, un único AGENTS.md y requirements.txt, scripts numerados y PDF en mayúsculas. El contexto local de Codex reconoció el agente actual y sus referencias a skills; se validaron las cuatro skills. La evidencia está en 09_VALIDACIONES/10_RECONOCIMIENTO_AGENTE.json.
+14. **Pruebas.** La integridad de fuentes se ejecuta en cada reproducción. La reproducción local y Linux compara artefactos de mapeo; la suite de tipos se registra por separado y no acepta una ejecución con cero pruebas.
+15. **Riesgos y rendimiento.** El inventario lee los archivos por bloques de 1 MiB. Los cambios posteriores requieren regenerarlo. Los datos de 01 no se publican, aunque sus nombres y hashes sí sirven como referencia de integridad.
+16. **Cambios.** Se numeraron fuentes, PDF, scripts, pruebas, módulos y salidas. Se eliminaron el agente archivado, la guía secundaria, el iniciador PowerShell, requirements-versiones, el listado Conda exclusivo de Windows, inventarios históricos y diagnósticos obsoletos. Se conserva un único AGENTS.md y un único requirements.txt.
+17. **Consideración operativa.** Se abre 04_AGENTES_SKILLS en Codex para cargar AGENTS.md y acceder a sus skills mediante referencias. No hay archivos de instrucciones ni enlaces técnicos de Codex sueltos en la raíz. Los nombres técnicos de formatos reconocidos se conservan dentro de sus carpetas.

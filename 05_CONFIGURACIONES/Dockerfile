@@ -1,0 +1,22 @@
+FROM mambaorg/micromamba:2.3.3@sha256:800e7ade3ffe29c9a9ac2026163131495f8197c3852e572c5835beb4e8a33cd6
+
+ENV ENV_NAME=espol \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=0 \
+    TZ=UTC
+
+WORKDIR /app/05_CONFIGURACIONES
+COPY --chown=$MAMBA_USER:$MAMBA_USER 05_CONFIGURACIONES/environment.yml 05_CONFIGURACIONES/requirements.txt ./
+RUN micromamba create --yes --file environment.yml && micromamba clean --all --yes
+
+WORKDIR /app
+COPY --chown=$MAMBA_USER:$MAMBA_USER 03_PROCESOS_ETL/ ./03_PROCESOS_ETL/
+COPY --chown=$MAMBA_USER:$MAMBA_USER 04_AGENTES_SKILLS/ ./04_AGENTES_SKILLS/
+COPY --chown=$MAMBA_USER:$MAMBA_USER 05_CONFIGURACIONES/01_PROYECTO.json ./05_CONFIGURACIONES/01_PROYECTO.json
+
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+RUN python -B 03_PROCESOS_ETL/03_VERIFICAR_ENTORNO.py && python -m pip check
+RUN if [ -f 03_PROCESOS_ETL/05_PRUEBAS/01_PRUEBAS_MAPEO.py ]; then python -B -m unittest 03_PROCESOS_ETL.05_PRUEBAS.01_PRUEBAS_MAPEO; else echo "Suite local no distribuida; entorno y dependencias comprobados."; fi
+
+CMD ["python", "-B", "03_PROCESOS_ETL/04_GESTION_PROYECTO.py", "reproducir"]

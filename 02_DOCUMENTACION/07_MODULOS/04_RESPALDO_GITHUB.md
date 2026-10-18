@@ -1,0 +1,23 @@
+# RESPALDO Y SINCRONIZACIÓN GITHUB
+
+1. **Objetivo.** Permitir respaldo manual del código, configuración y documentación mediante una receta en tercera persona, con un comando por bloque.
+2. **Archivos.** `02_DOCUMENTACION/05_RESPALDO_GITHUB.md` contiene la receta y `05_CONFIGURACIONES/.gitignore` las exclusiones solicitadas de fuentes, pruebas y residuos.
+3. **Flujo.** Se conserva el historial de main, se incorporan 02–05, se configura core.excludesFile, se revisan cambios, se crea commit y se sincroniza. No se usa push --force.
+4. **Entradas.** Repositorio https://github.com/marcelochavez-ec/TESIS_ESPOL, identidad real del autor, acceso Git y archivos locales. La contraseña de PostgreSQL no está en los archivos actuales.
+5. **Salidas.** Receta y prueba de exclusión en 09_VALIDACIONES/07_EXCLUSION_GIT.json. Se inicializó Git localmente, se registró origin y se configuró core.excludesFile. El commit se crea sobre main conservando su historial, y la publicación se verifica contra origin/main.
+6. **Fuentes.** Archivos del proyecto y lectura de referencias remotas: el repositorio tiene main con historial. No se publican los RDS/XLSX de 01.
+7. **Reglas.** .gitignore excluye /01_DATOS_FUENTE/, /03_PROCESOS_ETL/05_PRUEBAS/, /02_DOCUMENTACION/09_VALIDACIONES/, cachés, bytecode, logs y temporales. No hay exclusiones generales de PDF, Word, Excel, SQL ni Markdown. Los secretos se suministran por entorno o pgpass, no mediante archivos versionados.
+8. **Ubicación.** Como .gitignore está en 05, cada clonación necesita git config --local core.excludesFile con su ruta absoluta local. El script de inventario no crea un repositorio ni cambia la configuración global de Git.
+9. **UI.** Consola PowerShell y revisión en GitHub; no hay una interfaz propia.
+10. **Server.** No aplica. Git mantiene su metadata .git al clonar; esos objetos no son archivos publicados del proyecto.
+11. **SQL/ETL.** El respaldo no ejecuta SQL. La contraseña literal se retiró del constructor del ETL; se utilizan PGPASSWORD o pgpass, sin cambiar la contraseña del servidor.
+12. **Dependencias.** Git, PowerShell y acceso de red. Docker/Conda se utilizan después para reproducir, no son requisitos para guardar el repositorio.
+13. **Validaciones.** Se verifica cada archivo mediante git check-ignore y la lista publicable mediante git ls-files --others --exclude-standard. Fuentes, pruebas y evidencias quedan excluidas; scripts, agente, configuración, SQL, documentos PDF y ejemplos de Word/libros permanecen publicables. Se comprueba además una construcción y reproducción desde una copia filtrada sin pruebas ni evidencias anteriores. Los resultados locales quedan en 09_VALIDACIONES/07_EXCLUSION_GIT.json.
+14. **Pruebas sugeridas antes de push.** git status, git diff --cached y git ls-files de fuentes, pruebas y evidencias. La regla no retira del historial datos que se hubieran versionado anteriormente.
+15. **Riesgos.** Los datos de 01 requieren respaldo independiente. La copia original y una clonación hermana no se sincronizan por sí solas. Después de mover/clonar se repite la configuración local de exclusiones.
+16. **Cambios.** URL real, receta actualizada con nombres numerados, exclusiones de fuentes, pruebas, evidencias y residuos, configuración local efectiva y eliminación de referencias a credenciales literales ya retiradas.
+17. **Pendiente.** Las siguientes sincronizaciones siguen la receta. Si falla la autenticación o cambia el remoto, se informa el fallo y se conserva el commit local; nunca se utiliza push --force.
+
+18. **Ejecución sin suite publicada.** ejecutar_pruebas(requeridas=False) devuelve pruebas=null, correcto=null y estado=no_distribuidas si falta la suite; no informa una prueba aprobada. reproducir conserva versiones, hashes de entrada, dos mapeos y referencia aprobada. La acción pruebas exige la suite local y falla si no existe; una suite presente con cero casos o fallos sigue siendo un error. Dockerfile ejecuta la suite únicamente cuando está disponible. Esto permite reproducir desde GitHub sin distribuir archivos de prueba.
+
+19. **Publicación autorizada.** Se integró el proyecto sobre el historial existente de origin/main. La licencia original se trasladó a 05_CONFIGURACIONES/LICENSE, sin alterar su contenido. La receta se actualizó para clonar y ejecutar en otro Windows, recuperar las fuentes por separado, configurar exclusiones, preparar PostgreSQL y ejecutar el comando único. Antes del commit se comprueba que ninguna ruta excluida esté rastreada y se revisan los archivos publicados.

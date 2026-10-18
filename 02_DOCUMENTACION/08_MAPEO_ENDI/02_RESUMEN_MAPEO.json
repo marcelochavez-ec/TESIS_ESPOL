@@ -1,0 +1,59 @@
+{
+  "etapa": "MAPEO_PREVIO",
+  "margen_varchar": 10,
+  "tablas": [
+    {
+      "tabla": "f1_hogar",
+      "archivo": "01_BDD_ENDI_R2_F1_HOGAR.rds",
+      "registros": 20186,
+      "variables": 133
+    },
+    {
+      "tabla": "f1_personas",
+      "archivo": "02_BDD_ENDI_R2_F1_PERSONAS.rds",
+      "registros": 93242,
+      "variables": 124
+    },
+    {
+      "tabla": "f2_mef",
+      "archivo": "03_BDD_ENDI_R2_F2_MEF.rds",
+      "registros": 19846,
+      "variables": 289
+    },
+    {
+      "tabla": "f2_lactancia",
+      "archivo": "04_BDD_ENDI_R2_F2_LACTANCIA.rds",
+      "registros": 12141,
+      "variables": 71
+    },
+    {
+      "tabla": "f2_salud_ninez",
+      "archivo": "05_BDD_ENDI_R2_F2_SALUD_NINEZ.rds",
+      "registros": 22188,
+      "variables": 413
+    },
+    {
+      "tabla": "f3_desarrollo_inf",
+      "archivo": "06_BDD_ENDI_R2_F3_DESARROLLO_INFANTIL.rds",
+      "registros": 9836,
+      "variables": 393
+    }
+  ],
+  "variables_mapeadas": 1423,
+  "variables_sin_etiqueta": 0,
+  "tipos_sql": {
+    "SMALLINT": 888,
+    "DOUBLE PRECISION": 465,
+    "VARCHAR(12)": 18,
+    "VARCHAR(14)": 12,
+    "INTEGER": 10,
+    "VARCHAR(26)": 9,
+    "VARCHAR(20)": 6,
+    "VARCHAR(22)": 6,
+    "VARCHAR(24)": 6,
+    "VARCHAR(28)": 2,
+    "VARCHAR(30)": 1
+  },
+  "carga_ejecutada": false,
+  "constraints_creados": false
+}

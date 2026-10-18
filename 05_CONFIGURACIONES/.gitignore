@@ -1,0 +1,17 @@
+# Fuentes locales: no publicar microdatos ni diccionarios de datos.
+/01_DATOS_FUENTE/
+# Pruebas y evidencias de ejecución locales.
+/03_PROCESOS_ETL/05_PRUEBAS/
+/02_DOCUMENTACION/09_VALIDACIONES/
+# Residuos técnicos; no se excluyen documentos por su extensión.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+*.tmp
+*.temp
+~$*

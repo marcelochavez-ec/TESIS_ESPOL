@@ -1,0 +1,34 @@
+name: tesis-espol
+services:
+  mapeo:
+    image: tesis-espol:py315
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: 05_CONFIGURACIONES/Dockerfile
+    working_dir: /app
+    user: "${ESPOL_UID:-1000}:${ESPOL_GID:-1000}"
+    environment:
+      PGHOST: ${PGHOST_CONTENEDOR:-host.docker.internal}
+      PGPORT: ${PGPORT:-5432}
+      PGDATABASE: ${PGDATABASE:-research_lab}
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - type: bind
+        source: ../01_DATOS_FUENTE
+        target: /app/01_DATOS_FUENTE
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ../02_DOCUMENTACION
+        target: /app/02_DOCUMENTACION
+        bind:
+          create_host_path: false
+  recarga:
+    extends:
+      service: mapeo
+    command: ["python", "-B", "03_PROCESOS_ETL/04_GESTION_PROYECTO.py", "ejecutar", "--sobrescribir-fuentes"]

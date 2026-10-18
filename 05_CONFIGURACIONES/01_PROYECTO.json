@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "aliases_etiquetas": {
+    "f3_desarrollo_inf": {
+      "relacion_cuidadora": "relacion_cuidador",
+      "fexp_di": "fexp",
+      "f3_s0_1b_anio": "f3_s0_anio",
+      "f3_s0_1b_mes": "f3_s0_mes",
+      "f3_s0_1b_dia": "f3_s0_dia"
+    }
+  },
+  "python": "3.15.0",
+  "entorno": "espol",
+  "margen_varchar": 10,
+  "rutas": {
+    "fuentes": "01_DATOS_FUENTE",
+    "mapeo": "02_DOCUMENTACION/08_MAPEO_ENDI",
+    "validaciones": "02_DOCUMENTACION/09_VALIDACIONES",
+    "inventario": "02_DOCUMENTACION/06_INVENTARIO_PROYECTO.csv"
+  },
+  "postgresql": {
+    "host": "localhost",
+    "puerto": 5432,
+    "usuario": "postgres",
+    "base": "research_lab",
+    "esquema": "endi"
+  },
+  "fuentes": [
+    {
+      "tabla": "f1_hogar",
+      "archivo": "01_BDD_ENDI_R2_F1_HOGAR.rds",
+      "nombre_original": "BDD_ENDI_R2_f1_hogar.rds",
+      "sha256": "5f1fbc7fc916652f0220c7887a8a1a6ad7b42d33d49d1ecf57edeec55e431d27"
+    },
+    {
+      "tabla": "f1_personas",
+      "archivo": "02_BDD_ENDI_R2_F1_PERSONAS.rds",
+      "nombre_original": "BDD_ENDI_R2_f1_personas.rds",
+      "sha256": "98d4ed2d42e6f7e3eda81bc614840dd1c948bdfd1f9cea1d65a56776f92e4476"
+    },
+    {
+      "tabla": "f2_mef",
+      "archivo": "03_BDD_ENDI_R2_F2_MEF.rds",
+      "nombre_original": "BDD_ENDI_R2_f2_mef.rds",
+      "sha256": "cccc523f87cee4d854ee362c3aa5210c5a92839192b192d210d4ca197d3909ae"
+    },
+    {
+      "tabla": "f2_lactancia",
+      "archivo": "04_BDD_ENDI_R2_F2_LACTANCIA.rds",
+      "nombre_original": "BDD_ENDI_R2_f2_lactancia.rds",
+      "sha256": "f2c1e0f0e27c048d2e76ba3456601c8e645bc2d799ea794edb1913e05bb49521"
+    },
+    {
+      "tabla": "f2_salud_ninez",
+      "archivo": "05_BDD_ENDI_R2_F2_SALUD_NINEZ.rds",
+      "nombre_original": "BDD_ENDI_R2_f2_salud_ninez.rds",
+      "sha256": "523fbac17634606ec9ae360c4e4e3a5b5b036deb94abec5a09f648ac20cd5c67"
+    },
+    {
+      "tabla": "f3_desarrollo_inf",
+      "archivo": "06_BDD_ENDI_R2_F3_DESARROLLO_INFANTIL.rds",
+      "nombre_original": "BDD_ENDI_R2_f3_desarrollo_inf.rds",
+      "sha256": "65135243389e49e297713e3a7f15b5387e6b540d2a724b2dd59ba3fc65f480a2"
+    }
+  ],
+  "diccionarios": [
+    {
+      "archivo": "07_DICCIONARIO_ENDI.xlsx",
+      "nombre_original": "Diccionario_ENDI.xlsx",
+      "sha256": "eaf7e644d8fb3eac24e24e7b55ba64d42524451c97a9aa21b023de08a9d02ffc"
+    },
+    {
+      "archivo": "08_DICCIONARIO_DESARROLLO_INFANTIL.xlsx",
+      "nombre_original": "Diccionario_ENDI_di.xlsx",
+      "sha256": "e758de454b4898ba4b4062fda3c59a7ccbca89c725e5e1d8a88be8e30f14090d"
+    }
+  ],
+  "documentos": [
+    {
+      "archivo": "01_DOCUMENTO_METODOLOGICO_ENDI_R2.PDF",
+      "nombre_original": "Documento_metodologico_ENDI_R2.pdf",
+      "sha256": "cfc5db0e757cf2289cbf38ea803a55cb34c4f1b678f50e84fa3b5f4dadca1389"
+    },
+    {
+      "archivo": "02_GUIA_BASE_DATOS_ENDI_R2.PDF",
+      "nombre_original": "Guia_BDD_ENDI_R2.pdf",
+      "sha256": "314e9fabe38a55fa69e4921d2c1a47cd0ee846d592ee6b72a8d55988427a9974"
+    },
+    {
+      "archivo": "03_NOTA_TECNICA_ANEMIA.PDF",
+      "nombre_original": "Nota_Tecnica_Anemia.pdf",
+      "sha256": "c6e54b5e113af75c292203f63dcad6be8fb268492420205ee4e1976148beb264"
+    }
+  ],
+  "resultado_referencia": {
+    "variables_mapeadas": 1423,
+    "variables_sin_etiqueta": 0,
+    "archivos_mapeo_sha256": {
+      "01_MAPEO_VARIABLES.csv": "f50bc9fc91ba7fb8471c5e5acfc8581c671b1dce724145ca6dc48ace70656efb",
+      "02_RESUMEN_MAPEO.json": "c02e10e54f441f182dd8853593794c9ef170ba8205e9aa13d8f57584015b45ea",
+      "03_TIPOS_POSTGRESQL.sql": "2a39093b3206752fd5696a9273bbc55caee83cf86807ac0081e09a1bbcce633a"
+    }
+  }
+}

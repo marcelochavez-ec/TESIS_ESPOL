@@ -1,0 +1,5 @@
+01_DATOS_FUENTE/
+02_DOCUMENTACION/
+.git/
+**/__pycache__/
+**/*.pyc
