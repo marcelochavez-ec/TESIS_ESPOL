@@ -173,7 +173,7 @@ def main():
             RAIZ, esquema=config['postgresql']['esquema'], sobrescribir=True, solicitar_clave=True,
         )
         guardar_json(RAIZ/config['rutas']['validaciones']/'12_RECARGA_POSTGRESQL.json', resultado)
-        print('3/3 Recarga confirmada: filas, tipos y nulos verificados.', flush=True)
+        print('3/3 Recarga confirmada: filas, tipos, nulos, PK, FK y restricciones verificados.', flush=True)
         print(json.dumps(resultado, ensure_ascii=False, indent=2))
         inventariar()
         return

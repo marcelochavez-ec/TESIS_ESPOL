@@ -159,6 +159,8 @@ def recargar_fuentes_postgresql(raiz, *, esquema='endi', sobrescribir=False, sol
             raise ValueError(f'{archivo.name}: se esperaba un único objeto tabular.')
         fuentes[entrada['tabla']] = mapeo.mapear_dataframe(next(iter(objetos.values())), margen=config['margen_varchar'])
     clave = None
+    modelo = import_module('05_MODELO_RELACIONAL')
+    modelo.generar_sql(raiz, esquema)
     if solicitar_clave and not os.environ.get('PGPASSWORD') and not os.environ.get('PGPASSFILE'):
         clave = getpass(f"Clave PostgreSQL para {os.environ.get('PGUSER', config['postgresql']['usuario'])}: ")
     motor = ETL_ENDI(db_password=clave).engine
@@ -169,9 +171,11 @@ def recargar_fuentes_postgresql(raiz, *, esquema='endi', sobrescribir=False, sol
                 raise ValueError('La base conectada no coincide con research_lab; no se reemplaza ninguna tabla.')
             version = conexion.exec_driver_sql('SHOW server_version').scalar_one()
             tablas = mapeo.recargar_tablas(conexion, esquema, fuentes, sobrescribir=True)
+            relaciones = modelo.aplicar_modelo(conexion, esquema)
         return {'base': base, 'esquema': esquema, 'tablas': tablas,
                 'version_postgresql': version,
-                'recarga_confirmada': True, 'constraints_creados': False,
+                'recarga_confirmada': True, 'constraints_creados': True,
+                'modelo_relacional': relaciones,
                 'otras_tablas_modificadas': False}
     finally:
         motor.dispose()
